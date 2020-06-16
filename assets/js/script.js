@@ -134,9 +134,23 @@ $(".card .list-group").sortable({
     var arrName = $(this).attr("id").replace("list-","")
     tasks[arrName] = holder
     saveTasks()
-    console.log(holder)
+  }  
+});
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  over: function(event, ui) {
+    console.log("over");
+  },
+  out: function(event, ui) {
+    console.log("out");
+  },
+  drop: function(event,ui) {
+    ui.draggable.remove()
   }
+
 })
+
 // load tasks for the first time
 loadTasks();
 
