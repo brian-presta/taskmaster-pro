@@ -67,7 +67,7 @@ $(".list-group").on("blur","input",function(){
   saveTasks()
   var taskSpan = $("<span>").addClass('badge badge-primary badge-pill').text(date)
   $(this).replaceWith(taskSpan)
-
+  
 })
 // due date was clicked
 $(".list-group").on("click","span",function(){
