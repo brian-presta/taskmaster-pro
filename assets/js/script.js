@@ -119,6 +119,24 @@ $("#remove-tasks").on("click", function() {
   saveTasks();
 });
 
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  update: function(event) {
+    var holder = []
+    $(this).children().each(function(){
+      var text = $(this).find("p").text().trim()
+      var date = $(this).find("span").text().trim()
+      holder.push({text:text,date:date})
+    })
+    var arrName = $(this).attr("id").replace("list-","")
+    tasks[arrName] = holder
+    saveTasks()
+    console.log(holder)
+  }
+})
 // load tasks for the first time
 loadTasks();
 
