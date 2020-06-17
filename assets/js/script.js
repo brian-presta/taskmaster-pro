@@ -13,6 +13,8 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  // Check due date
+  auditTask(taskLi)
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
@@ -43,6 +45,20 @@ var loadTasks = function() {
 var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
+var auditTask = function(task) {
+  task = $(task)
+  // get date from task element
+  var date = task.find("span").text().trim()
+  // convert date to moment object at 5:00 PM
+  var time = moment(date,"L").set("hour",17)
+  task.removeClass("list-group-item-warning list-group-item-danger")
+  if (moment().isAfter(time)) {
+    task.addClass("list-group-item-danger")
+  }
+  else if (Math.abs(moment().diff(time,"days")) <= 2) {
+    task.addClass("list-group-item-warning")
+  }
+};
 // task text was clicked
 $(".list-group").on("click",'p',function(){
   var text = $(this).text()
@@ -59,13 +75,13 @@ $(".list-group").on("blur","textarea",function(){
   var taskP = $("<p>").addClass("m-1").text(text)
   $(this).replaceWith(taskP)
 });
-// due date was clicked
+// edit handling (due date was clicked)
 $(".list-group").on("click","span",function(){
   var date = $(this).text().trim()
   var dateInput = $("<input>").attr("type","text").addClass("form-control").val(date)
   dateInput.datepicker({
     defaultDate: 1,
-    minDate: 1,
+    // minDate: 1,
     onClose: function(){
       $(this).trigger("change")
     }
@@ -81,6 +97,7 @@ $(".list-group").on("change","input",function(){
   saveTasks()
   var taskSpan = $("<span>").addClass('badge badge-primary badge-pill').text(date)
   $(this).replaceWith(taskSpan)
+  auditTask($(taskSpan).closest(".list-group-item"))
 });
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
@@ -100,11 +117,7 @@ $("#task-form-modal .btn-primary").click(function() {
   var taskText = $("#modalTaskDescription").val();
   var taskDate = $("#modalDueDate").val();
   if (!taskDate) {
-    var today = new Date();
-    var dd = String(today.getDate()+1).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    var yyyy = today.getFullYear();
-    taskDate = mm + '/' + dd + '/' + yyyy
+    taskDate = moment().add(1,"days").format("M/D/YYYY")
   }
   if (taskText && taskDate) {
     createTask(taskText, taskDate, "toDo");
@@ -163,8 +176,8 @@ $("#trash").droppable({
 
 })
 $('#modalDueDate').datepicker({
-  defaultDate: 1,
-  minDate: 1
+  defaultDate: 1
+  // minDate: 1
 })
 
 // load tasks for the first time
