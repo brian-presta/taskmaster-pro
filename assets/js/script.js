@@ -59,7 +59,21 @@ $(".list-group").on("blur","textarea",function(){
   var taskP = $("<p>").addClass("m-1").text(text)
   $(this).replaceWith(taskP)
 });
-$(".list-group").on("blur","input",function(){
+// due date was clicked
+$(".list-group").on("click","span",function(){
+  var date = $(this).text().trim()
+  var dateInput = $("<input>").attr("type","text").addClass("form-control").val(date)
+  dateInput.datepicker({
+    defaultDate: 1,
+    minDate: 1,
+    onClose: function(){
+      $(this).trigger("change")
+    }
+  })
+  $(this).replaceWith(dateInput)
+  dateInput.trigger("focus")
+});
+$(".list-group").on("change","input",function(){
   var date = $(this).val().trim()
   var status = $(this).closest(".list-group").attr("id").replace("list-","")
   var index = $(this).closest(".list-group-item").index()
@@ -67,15 +81,7 @@ $(".list-group").on("blur","input",function(){
   saveTasks()
   var taskSpan = $("<span>").addClass('badge badge-primary badge-pill').text(date)
   $(this).replaceWith(taskSpan)
-  
-})
-// due date was clicked
-$(".list-group").on("click","span",function(){
-  var date = $(this).text().trim()
-  var dateInput = $("<input>").attr("type","text").addClass("form-control").val(date)
-  $(this).replaceWith(dateInput)
-  dateInput.trigger("focus")
-})
+});
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
   // clear values
@@ -93,7 +99,13 @@ $("#task-form-modal .btn-primary").click(function() {
   // get form values
   var taskText = $("#modalTaskDescription").val();
   var taskDate = $("#modalDueDate").val();
-
+  if (!taskDate) {
+    var today = new Date();
+    var dd = String(today.getDate()+1).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    taskDate = mm + '/' + dd + '/' + yyyy
+  }
   if (taskText && taskDate) {
     createTask(taskText, taskDate, "toDo");
 
@@ -149,6 +161,10 @@ $("#trash").droppable({
     ui.draggable.remove()
   }
 
+})
+$('#modalDueDate').datepicker({
+  defaultDate: 1,
+  minDate: 1
 })
 
 // load tasks for the first time
