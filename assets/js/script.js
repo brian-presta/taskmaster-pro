@@ -179,7 +179,9 @@ $('#modalDueDate').datepicker({
   defaultDate: 1
   // minDate: 1
 })
-
+setInterval(function(){
+  $(".card .list-group-item").each(function(x){auditTask(x)})
+},180000)
 // load tasks for the first time
 loadTasks();
 
